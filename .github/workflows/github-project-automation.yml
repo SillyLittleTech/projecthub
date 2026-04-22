@@ -42,48 +42,99 @@ jobs:
             const repo = context.repo.repo;
             const issueNumber = context.payload.issue.number;
 
-            const query = `
-              query($owner: String!, $repo: String!, $issueNumber: Int!) {
-                repository(owner: $owner, name: $repo) {
-                  issue(number: $issueNumber) {
-                    projectItems(first: 20) {
-                      nodes {
-                        id
-                        project {
-                          id
-                          fields(first: 50) {
-                            nodes {
-                              ... on ProjectV2SingleSelectField {
-                                id
-                                name
-                                options {
-                                  id
-                                  name
-                                }
-                              }
+            const items = [];
+            let itemCursor = null;
+            let hasNextItemPage = true;
+
+            while (hasNextItemPage) {
+              const itemsResult = await github.graphql(
+                `
+                  query($owner: String!, $repo: String!, $issueNumber: Int!, $itemCursor: String) {
+                    repository(owner: $owner, name: $repo) {
+                      issue(number: $issueNumber) {
+                        projectItems(first: 100, after: $itemCursor) {
+                          nodes {
+                            id
+                            project {
+                              id
                             }
+                          }
+                          pageInfo {
+                            hasNextPage
+                            endCursor
                           }
                         }
                       }
                     }
                   }
-                }
-              }
-            `;
+                `,
+                { owner, repo, issueNumber, itemCursor },
+              );
 
-            const result = await github.graphql(query, { owner, repo, issueNumber });
-            const items = result.repository.issue.projectItems.nodes;
+              const page = itemsResult.repository.issue.projectItems;
+              items.push(...page.nodes);
+              hasNextItemPage = page.pageInfo.hasNextPage;
+              itemCursor = page.pageInfo.endCursor;
+            }
 
             if (!items.length) {
               core.info('Issue is not in any projects; nothing to update.');
               return;
             }
 
+            const statusFieldCache = new Map();
             let updated = 0;
 
             for (const item of items) {
               const projectId = item.project.id;
-              const statusField = item.project.fields.nodes.find((field) => field.name === 'Status');
+              let statusField = statusFieldCache.get(projectId);
+
+              if (statusField === undefined) {
+                let fieldCursor = null;
+                let hasNextFieldPage = true;
+                statusField = null;
+
+                while (hasNextFieldPage && !statusField) {
+                  const fieldsResult = await github.graphql(
+                    `
+                      query($projectId: ID!, $fieldCursor: String) {
+                        node(id: $projectId) {
+                          ... on ProjectV2 {
+                            fields(first: 100, after: $fieldCursor) {
+                              nodes {
+                                ... on ProjectV2SingleSelectField {
+                                  id
+                                  name
+                                  options {
+                                    id
+                                    name
+                                  }
+                                }
+                              }
+                              pageInfo {
+                                hasNextPage
+                                endCursor
+                              }
+                            }
+                          }
+                        }
+                      }
+                    `,
+                    { projectId, fieldCursor },
+                  );
+
+                  const fieldPage = fieldsResult.node?.fields;
+                  if (!fieldPage) {
+                    core.info(`Project ${projectId} fields could not be read; skipping item ${item.id}.`);
+                    break;
+                  }
+                  statusField = fieldPage.nodes.find((field) => field.name === 'Status') || null;
+                  hasNextFieldPage = fieldPage.pageInfo.hasNextPage;
+                  fieldCursor = fieldPage.pageInfo.endCursor;
+                }
+
+                statusFieldCache.set(projectId, statusField);
+              }
 
               if (!statusField) {
                 core.info(`Project ${projectId} has no Status field; skipping item ${item.id}.`);
