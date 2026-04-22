@@ -130,7 +130,7 @@ jobs:
                     core.info(`Project ${projectId} fields could not be read; skipping item ${item.id}.`);
                     break;
                   }
-                  statusField = fieldPage.nodes.find((field) => field.name === STATUS_FIELD_NAME) || null;
+                  statusField = fieldPage.nodes.find((field) => field && field.name === STATUS_FIELD_NAME) || null;
                   hasNextFieldPage = fieldPage.pageInfo.hasNextPage;
                   fieldCursor = fieldPage.pageInfo.endCursor;
                 }
