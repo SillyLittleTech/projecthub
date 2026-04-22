@@ -13,7 +13,6 @@ permissions:
 jobs:
   update-status-for-administrative-issues:
     runs-on: ubuntu-latest
-    if: ${{ github.event.issue.state_reason == 'completed' || github.event.issue.state_reason == 'not_planned' }}
     steps:
       - name: Set project status to CCC/NCC for administrative issues
         uses: actions/github-script@v7
@@ -26,11 +25,14 @@ jobs:
               return;
             }
 
+            const STATUS_FIELD_NAME = 'Status';
+            const PROJECT_STATUS_FOR_COMPLETED_ADMIN_ISSUE = 'CCC';
+            const PROJECT_STATUS_FOR_NOT_PLANNED_ADMIN_ISSUE = 'NCC';
             const stateReason = context.payload.issue.state_reason;
             const targetStatus = stateReason === 'completed'
-              ? 'CCC'
+              ? PROJECT_STATUS_FOR_COMPLETED_ADMIN_ISSUE
               : stateReason === 'not_planned'
-                ? 'NCC'
+                ? PROJECT_STATUS_FOR_NOT_PLANNED_ADMIN_ISSUE
                 : null;
 
             if (!targetStatus) {
@@ -128,7 +130,7 @@ jobs:
                     core.info(`Project ${projectId} fields could not be read; skipping item ${item.id}.`);
                     break;
                   }
-                  statusField = fieldPage.nodes.find((field) => field.name === 'Status') || null;
+                  statusField = fieldPage.nodes.find((field) => field.name === STATUS_FIELD_NAME) || null;
                   hasNextFieldPage = fieldPage.pageInfo.hasNextPage;
                   fieldCursor = fieldPage.pageInfo.endCursor;
                 }
@@ -137,7 +139,7 @@ jobs:
               }
 
               if (!statusField) {
-                core.info(`Project ${projectId} has no Status field; skipping item ${item.id}.`);
+                core.info(`Project ${projectId} has no ${STATUS_FIELD_NAME} field; skipping item ${item.id}.`);
                 continue;
               }
 
