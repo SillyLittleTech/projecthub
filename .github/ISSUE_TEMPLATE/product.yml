@@ -1,0 +1,39 @@
+name: 💡 Product
+description: Workshop a product idea (Product Launchpad).
+title: "[💡]: <Short title of your idea>"
+labels: ["concepting"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Welcome to the Product Launchpad! 🚀
+        This form is for product ideas. This will automatically receive the `concepting` label, but labels can be edited later on.
+  - type: textarea
+    id: idea_description
+    attributes:
+      label: Concept Description
+      description: What is the core idea? Describe it in a few sentences.
+      placeholder: "We should build a feature that allows users to..."
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Expected Impact & Goals
+      description: What problem does this solve, and who does it help?
+    validations:
+      required: true
+  - type: dropdown
+    id: project_type
+    attributes:
+      label: Intended Project Scope
+      description: How do you envision this project functioning if it goes to production?
+      options:
+        - Unknown / Undecided
+        - Public Goods Project
+        - Internal Goods Project
+  - type: textarea
+    id: resources
+    attributes:
+      label: Potential Needs
+      description: What kind of development resources or research might this need? (If currently under-resourced, we can later add the `idealab` label).
