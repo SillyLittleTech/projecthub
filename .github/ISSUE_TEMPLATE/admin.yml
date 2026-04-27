@@ -1,0 +1,38 @@
+name: 📋 Administrative Task
+description: Create an NPO operational task like grants, contracts, or donations (NPO Statusprint).
+title: "[📋]: <Short description of the task>"
+labels: ["administrative"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## NPO Operations Hub 🏢
+        Use this form to track administrative activities. This will automatically receive the `administrative` label.
+  - type: textarea
+    id: task_description
+    attributes:
+      label: Task Description
+      description: Detail the administrative operation (e.g., Grantmaking, Contracts, Donations).
+      placeholder: "Review and sign the Q3 vendor contract for..."
+    validations:
+      required: true
+  - type: input
+    id: deadline
+    attributes:
+      label: Deadline
+      description: When does this administrative task need to be completed?
+      placeholder: "e.g., May 21, 2026"
+    validations:
+      required: false
+  - type: textarea
+    id: third_parties
+    attributes:
+      label: Third-Party Dependencies
+      description: Are we working with or waiting on any external organizations? (Note: If we end up waiting for a response, we can add the `wis` label later).
+  - type: checkboxes
+    id: status_check
+    attributes:
+      label: Initial Status
+      description: Select the current track for this task.
+      options:
+        - label: "On Track (`on-track`)"
