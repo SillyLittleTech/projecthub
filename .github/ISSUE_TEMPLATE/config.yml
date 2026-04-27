@@ -1,0 +1,12 @@
+blank_issues_enabled: true
+
+contact_links:
+  - name: General Discussions
+    url: https://github.com/orgs/SillyLittleTech/discussions
+    about: Ask a question or start a discussion rather than a finite concept administrative or project based.
+  - name: Projects Page
+    url: https://projects.sillylittle.tech
+    about: Current projects
+  - name: Current Backlog
+    url: https://share.sillylittle.tech/backlog
+    about: Current backlog of projects and administrative tasks, listed all pretty like.
