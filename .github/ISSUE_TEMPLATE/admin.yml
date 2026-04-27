@@ -12,7 +12,7 @@ body:
     id: task_description
     attributes:
       label: Task Description
-      description: Detail the administrative operation (e.g., Grantmaking, Contracts, Donations).
+      description: "Detail the administrative operation (e.g., Grantmaking, Contracts, Donations)."
       placeholder: "Review and sign the Q3 vendor contract for..."
     validations:
       required: true
@@ -20,19 +20,19 @@ body:
     id: deadline
     attributes:
       label: Deadline
-      description: When does this administrative task need to be completed?
+      description: "When does this administrative task need to be completed?"
       placeholder: "e.g., May 21, 2026"
     validations:
-      required: false
+      required: true
   - type: textarea
     id: third_parties
     attributes:
       label: Third-Party Dependencies
-      description: Are we working with or waiting on any external organizations? (Note: If we end up waiting for a response, we can add the `wis` label later).
+      description: "Are we working with or waiting on any external organizations? (Note: If we end up waiting for a response, we can add the `wis` label later)."
   - type: checkboxes
     id: status_check
     attributes:
       label: Initial Status
-      description: Select the current track for this task.
+      description: "Select the current track for this task."
       options:
         - label: "On Track (`on-track`)"
